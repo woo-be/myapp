@@ -1,5 +1,6 @@
 package bitcamp.myapp.controller;
 
+import bitcamp.myapp.annotation.LoginUser;
 import bitcamp.myapp.service.Board2Service;
 import bitcamp.myapp.service.StorageService;
 import bitcamp.myapp.vo.AttachedFile;
@@ -45,10 +46,12 @@ public class Board2Controller {
   @PostMapping("add")
   public String add(
       Board board,
+      @LoginUser Member loginUser,
       HttpSession session,
       SessionStatus sessionStatus) throws Exception {
 
-    Member loginUser = (Member) session.getAttribute("loginUser");
+    log.debug(loginUser);
+
     if (loginUser == null) {
       throw new Exception("로그인하시기 바랍니다!");
     }
@@ -56,6 +59,9 @@ public class Board2Controller {
 
     // 게시글 등록할 때 삽입한 이미지 목록을 세션에서 가져온다.
     List<AttachedFile> attachedFiles = (List<AttachedFile>) session.getAttribute("attachedFiles");
+    if (attachedFiles == null) {
+      attachedFiles = new ArrayList<>();
+    }
 
     for (int i = attachedFiles.size() - 1; i >= 0; i--) {
       AttachedFile attachedFile = attachedFiles.get(i);
@@ -136,6 +142,9 @@ public class Board2Controller {
 
     // 게시글 변경할 때 삽입한 이미지 목록을 세션에서 가져온다.
     List<AttachedFile> attachedFiles = (List<AttachedFile>) session.getAttribute("attachedFiles");
+    if (attachedFiles == null) {
+      attachedFiles = new ArrayList<>();
+    }
 
     if (old.getFileList().size() > 0) {
       // 기존 게시글에 등록된 이미지 목록과 합친다.
